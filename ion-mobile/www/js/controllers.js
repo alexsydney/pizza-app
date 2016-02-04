@@ -1,5 +1,19 @@
 angular.module('conFusion.controllers', [])
 
+  .filter('favoriteFilter', function () {
+    return function (dishes, favorites) {
+      var out = [];
+      for (var i = 0; i < favorites.length; i++) {
+        for (var j = 0; j < dishes.length; j++) {
+          if (dishes[j].id === favorites[i].id)
+            out.push(dishes[j]);
+        }
+      }
+      return out;
+
+    }})
+
+
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
   // With the new view caching in Ionic, Controllers are only called
@@ -70,7 +84,8 @@ angular.module('conFusion.controllers', [])
 
 
 
-  .controller('MenuController', ['$scope', 'menuFactory' , 'baseURL' , function($scope, menuFactory, baseURL) {
+  .controller('MenuController', ['$scope', 'menuFactory' , 'favoriteFactory', '$ionicListDelegate', 'baseURL' ,
+    function($scope, menuFactory, favoriteFactory  ,$ionicListDelegate , baseURL) {
       $scope.baseURL = baseURL;
       $scope.tab = 1;
       $scope.filtText = '';
@@ -113,6 +128,11 @@ angular.module('conFusion.controllers', [])
       $scope.toggleDetails = function() {
           $scope.showDetails = !$scope.showDetails;
       };
+
+      $scope.addFavorite = function(index){
+        favoriteFactory.addToFavorites(index);
+        $ionicListDelegate.closeOptionButtons();//used to close option button in teh view
+      }
   }])
 
   .controller('ContactController', ['$scope', function($scope) {
@@ -130,7 +150,6 @@ angular.module('conFusion.controllers', [])
 
       $scope.sendFeedback = function() {
 
-          console.log($scope.feedback);
 
           if ($scope.feedback.agree && ($scope.feedback.mychannel == "")) {
               $scope.invalidChannelSelection = true;
@@ -211,5 +230,33 @@ angular.module('conFusion.controllers', [])
               $scope.leaders = corporateFactory.query();
 
               }])
+  .controller('FavoritesController', ['$scope', 'menuFactory', 'favoriteFactory', 'baseURL', '$ionicListDelegate', function ($scope, menuFactory, favoriteFactory, baseURL, $ionicListDelegate) {
+
+    $scope.baseURL = baseURL;
+    $scope.shouldShowDelete = false;
+
+    $scope.favorites = favoriteFactory.getFavorites();
+
+    $scope.dishes = menuFactory.getDishes().query(
+      function (response) {
+        $scope.dishes = response;
+      },
+      function (response) {
+        $scope.message = "Error: " + response.status + " " + response.statusText;
+      });
+
+    $scope.toggleDelete = function () {
+      $scope.shouldShowDelete = !$scope.shouldShowDelete;
+    };
+
+    $scope.deleteFavorite = function (index) {
+
+      favoriteFactory.deleteFromFavorites(index);
+      $scope.shouldShowDelete = false;
+
+    }}])
+
+
+
 
 ;
