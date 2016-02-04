@@ -1,10 +1,15 @@
 <ion-view view-title="Dish Details">
+  <ion-nav-buttons side="right">
+    <div class="buttons">
+      <button class="button button-icon icon ion-android-more-horizontal" ng-click="openPopover($event)"></button>
+    </div>
+  </ion-nav-buttons><!-- nav buttons -->
   <ion-content>
       <div class="card">
           <div class="item item-body item-text-wrap">
                <img class="full-image" ng-src="{{baseURL+dish.image}}" alt="Uthappizza">
                 <h2>{{dish.name}}
-                 <span style="font-size:75%">{{dish.price | currency}}</span>
+                 <span>{{dish.price | currency}}</span>
                 <span class="badge badge-assertive">{{dish.label}}</span></h2>
                 <p>{{dish.description}}</p>
           </div>
