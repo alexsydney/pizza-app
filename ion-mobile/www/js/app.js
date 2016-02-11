@@ -39,7 +39,7 @@ angular.module('conFusion', ['ionic', 'conFusion.controllers' , 'conFusion.servi
         templateUrl: 'templates/home.html',
           controller: 'IndexController'
       }
-    },
+    }
   })
 
   .state('app.aboutus', {
@@ -66,7 +66,16 @@ angular.module('conFusion', ['ionic', 'conFusion.controllers' , 'conFusion.servi
       views: {
         'mainContent': {
           templateUrl: 'templates/favorites.html',
-          controller:  'FavoritesController'
+          controller:'FavoritesController',
+          resolve: {
+            dishes:  ['menuFactory', function(menuFactory){
+              console.log(menuFactory.query());
+              return menuFactory.query();
+            }],
+            favorites: ['favoriteFactory', function(favoriteFactory) {
+              return favoriteFactory.getFavorites();
+            }]
+          }
         }
       }
     })
@@ -85,8 +94,14 @@ angular.module('conFusion', ['ionic', 'conFusion.controllers' , 'conFusion.servi
     views: {
       'mainContent': {
         templateUrl: 'templates/dishdetail.html',
-        controller: 'DishDetailController'
+        controller: 'DishDetailController',
+        resolve: {
+          dish: ['$stateParams', 'menuFactory',function($stateParams, menuFactory) {
+            return menuFactory.get({id:parseInt($stateParams.id, 10)})
+          }]
+        }
       }
+
     }
   });
 
