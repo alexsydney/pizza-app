@@ -14,7 +14,7 @@ angular.module('conFusion.controllers', [])
     }})
 
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout , $localStorage) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -24,7 +24,7 @@ angular.module('conFusion.controllers', [])
   //});
 
   // Form data for the login modal
-  $scope.loginData = {};
+  $scope.loginData = $localStorage.getObject('userinfo', '{}');
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -45,8 +45,7 @@ angular.module('conFusion.controllers', [])
 
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
+     $localStorage.storeObject('userinfo',$scope.loginData);
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
     $timeout(function() {
@@ -84,24 +83,12 @@ angular.module('conFusion.controllers', [])
 
 
 
-  .controller('MenuController', ['$scope', 'menuFactory' , 'favoriteFactory', '$ionicListDelegate', 'baseURL' ,
-    function($scope, menuFactory, favoriteFactory  ,$ionicListDelegate , baseURL) {
+  .controller('MenuController', ['$scope', 'dishes' , 'favoriteFactory', '$ionicListDelegate', 'baseURL' ,
+    function($scope, dishes, favoriteFactory  ,$ionicListDelegate , baseURL) {
       $scope.baseURL = baseURL;
       $scope.tab = 1;
       $scope.filtText = '';
-      $scope.showDetails = false;
-      $scope.showMenu = false;
-      $scope.message = "Loading ...";
-
-      menuFactory.query(
-          function(response) {
-            console.log(response);
-              $scope.dishes = response;
-              $scope.showMenu = true;
-          },
-          function(response) {
-              $scope.message = "Error: "+response.status + " " + response.statusText;
-          });
+      $scope.dishes = dishes;
 
 
       $scope.select = function(setTab) {
@@ -235,33 +222,17 @@ angular.module('conFusion.controllers', [])
 
   // implement the IndexController and About Controller here
 
-  .controller('IndexController', ['$scope', 'menuFactory', 'corporateFactory', 'promotionFactory' , 'baseURL', function($scope, menuFactory, corporateFactory , promotionFactory , baseURL) {
+  .controller('IndexController', ['$scope', 'leader', 'dish', 'promotion' , 'baseURL', function($scope, leader, dish, promotion, menuFactory, corporateFactory , promotionFactory , baseURL) {
                   $scope.baseURL = baseURL;
-                  $scope.leader = corporateFactory.get({id:3});
-                  $scope.showDish = false;
-                  $scope.message="Loading ...";
-                  $scope.dish = menuFactory.get({
-                      id: 0
-                    })
-                    .$promise.then(
-                      function (response) {
-                        $scope.dish = response;
-                        $scope.showDish = true;
-                      },
-                      function (response) {
-                        $scope.message = "Error: " + response.status + " " + response.statusText;
-                      }
-                    );
-
-                  $scope.promotion = promotionFactory.get({
-                    id: 0
-                  });
+                  $scope.leader = leader;
+                  $scope.dish = dish;
+                  $scope.promotion = promotion;
 
               }])
 
-  .controller('AboutController', ['$scope', 'corporateFactory' , 'baseURL', function($scope, corporateFactory, baseURL) {
+  .controller('AboutController', ['$scope', 'leaders' , 'baseURL', function($scope, leaders, baseURL) {
               $scope.baseURL = baseURL;
-              $scope.leaders = corporateFactory.query();
+              $scope.leaders = leaders
 
               }])
 
@@ -276,7 +247,7 @@ angular.module('conFusion.controllers', [])
     $scope.dishes = dishes;
 
 
-    
+
 
     $scope.toggleDelete = function () {
       $scope.shouldShowDelete = !$scope.shouldShowDelete;
