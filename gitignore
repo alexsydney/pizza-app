@@ -11,6 +11,8 @@ pids
 logs
 results
 build
-
-node_modules
-bower_components
+**/node_modules
+**/bower_components
+node-express-server/node_modules
+bower_components/
+node_modules/
